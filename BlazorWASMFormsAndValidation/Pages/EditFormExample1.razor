@@ -1,0 +1,82 @@
+﻿@page "/editformexample1"
+@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="@exampleModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="exampleModel.Name" class="form-control" placeholder="Enter name" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="exampleModel.Email" class="form-control" placeholder="Enter email" />
+    </div>
+    <div class="form-group">
+        <label for="date">Date:</label>
+        <InputDate id="date" @bind-Value="exampleModel.Date" class="form-control" placeholder="Enter date" />
+    </div>
+    <div class="form-group">
+        <label for="pin">Pin:</label>
+        <InputText id="pin" @bind-Value="exampleModel.Pin" class="form-control" placeholder="Enter pin" />
+    </div>
+    <div class="form-check">
+        <InputCheckbox id="checkbox1" @bind-Value="exampleModel.Agree" class="form-check-input" />
+        <label class="form-check-label" for="checkbox1">I Agree</label>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-outline-primary">Submit</button>
+    @if (output != "")
+    {
+        <br /><br />
+        <div class="form-group">
+            <label for="result">Submit Result:</label>
+            <InputTextArea id="result" @bind-Value="@output" rows="8" class="form-control" />
+        </div>
+    }
+
+</EditForm>
+
+@code {
+
+    private ExampleModel exampleModel = new();
+    private string output = "";
+
+    protected override void OnInitialized()
+    {
+        exampleModel.Date = DateTime.Today;
+    }
+
+    private void HandleValidSubmit()
+    {
+        // Process the valid form inputs   
+        this.output = $" Form has been submitted with following info:\n Name: {exampleModel.Name}\n" +
+                      $" Email: {exampleModel.Email}\n Pin: {exampleModel.Pin}\n " +
+                      $"I Agree: {exampleModel.Agree.ToString()}";
+    }
+
+
+    public class ExampleModel
+    {
+        [Required]
+        [StringLength(20, ErrorMessage = "Name is too long.")]
+        public string Name { get; set; }
+
+        [Required]
+        [StringLength(50, ErrorMessage = "Enter valid email.")]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [Range(1000, 9999, ErrorMessage = "Enter 4 digit pin number between (1000, 9999).")]
+        public string Pin { get; set; }
+
+        [Required]
+        public DateTime Date { get; set; }
+
+        [Required]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "This form disallows not agreed user info.")]
+        public bool Agree { get; set; }
+    }
+}
